@@ -98,7 +98,7 @@ const DEFG=()=>({grades:[['g1','السادس',9],['g2','السابع',8],['g3','
 let db=1,ready=false,isAdmin=false,canW=true,online=-1,sig='',CFG=null,STU={},ABS={},unsubA=null,T='entry',G=null,K=null,D=td(),pend='',msg='',IMP=null,IS='all',dirty=0,conf={},SEL=new Set(),SM=0,LK=null;
 
 /* ===== طبقة التخزين: Google Sheets (عبر Apps Script) أو وضع محلي ===== */
-const APP_V='2.2 • 2026-11-12';
+const APP_V='2.4 • 2026-11-13';
 let NEWV='';
 const DEF_URL='https://script.google.com/macros/s/AKfycbzrdJE30ZjM-V92FiWHSpmxfMC7PQyEYYmo7vFatNYbPoS2Y15E7Wf6kUHAbLfGyPhPYg/exec',DEF_TOKEN='';/* يمكنك وضع رابط التطبيق والرمز هنا ليعمل الملف مباشرة لكل المعلمين */
 const LS=k=>{try{return localStorage.getItem(k)}catch(e){return null}},LSS=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
@@ -129,7 +129,7 @@ await pull();R()}
 function vConn(){return `<div class="card"><b>الربط مع Google Sheets</b><div class="mu" style="margin:6px 0">${URL_?(online===1?'✅ متصل بالجدول — الصلاحية الحالية: '+(RN[ROLE]||'—'):'⚠️ الرابط محفوظ لكن الاتصال غير ناجح حاليًا.'):'أدخل رابط تطبيق Google Sheets (Apps Script) وكلمة المرور لبدء الاستخدام.'}</div><div class="row"><input id="cu" dir="ltr" placeholder="رابط تطبيق الويب (Apps Script)" value="${esc(URL_)}"></div><div class="row"><input id="ct" dir="ltr" type="password" placeholder="كلمة المرور" value="${esc(TOK)}"></div><div class="bar"><button class="p" onclick="saveConn()">حفظ واختبار الاتصال</button></div><div class="mu">تحدد كلمة المرور الصلاحية: معلم (رصد فقط)، مشرف (رصد وإحصائيات)، مدير (صلاحيات كاملة).</div>${verTag()}</div>`}
 
 /* ===== رموز QR للفصول ===== */
-let QR=0,GATE=0,LSIG='',ROLE='',PD=0,SUPG='',RG={g:'',from:'',to:'',data:null};const RN={admin:'مدير',sup:'مشرف',teacher:'معلم'};
+let QL=LS('abs_ql')||'',QR=0,GATE=0,LSIG='',ROLE='',PD=0,SUPG='',RG={g:'',from:'',to:'',data:null};const RN={admin:'مدير',sup:'مشرف',teacher:'معلم'};
 function setRole(r,g){ROLE=r||'';SUPG=ROLE=='sup'?(g||''):'';isAdmin=ROLE=='admin'}
 function canStat(){return ROLE=='admin'||ROLE=='sup'}
 function pwCard(){const f=(r,l)=>`<div class="row"><b style="min-width:80px">${l}</b><input id="pw_${r}" type="password" dir="ltr" autocomplete="new-password" placeholder="كلمة مرور جديدة"><button onclick="setPw('${r}')">حفظ</button></div>`;return `<div class="card"><b>🔑 كلمات المرور</b><div class="mu" style="margin:6px 0">غيّر كلمة مرور أي دور. مشرف الصف يستلم صفًا كاملًا فقط (يرصد ويرى إحصائياته). تُحفظ في الخادم، ومن يستخدم الكلمة القديمة يُطلب منه الدخول من جديد. 4 أحرف على الأقل، ويجب أن تكون الكلمات الثلاث مختلفة.</div>${f('teacher','المعلم')}${f('sup','مشرف عام (كل الصفوف)')}${cfg().grades.map(g=>f('sup:'+g.id,'مشرف '+esc(g.name))).join('')}${f('admin','المدير')}</div>`}
@@ -203,7 +203,7 @@ else{h+='<div class="bar"><button class="p" onclick="QR=!QR;R()">'+(QR?'إخفا
 return h+'</div>'}
 function applyHash(){const h=location.hash.slice(1);if(!h)return false;const p=new URLSearchParams(h),old=URL_;let ch=false;
 if(p.get('u')&&p.get('u')!==URL_){URL_=p.get('u');LSS('abs_url',URL_);ch=true}
-const c=p.get('c');if(c&&/^[\w-]+_\d+$/.test(c)){K=c;G=c.split('_')[0];T='entry';GATE=URL_&&(LS('abs_rem')!=='1'||URL_!==old)?1:0}
+const c=p.get('c');if(c&&/^[\w-]+_\d+$/.test(c)){K=c;QL=c;LSS('abs_ql',c);G=c.split('_')[0];T='entry';GATE=URL_&&(LS('abs_rem')!=='1'||URL_!==old)?1:0}
 if(ch||c){try{history.replaceState(null,'',location.pathname+location.search+(c?'#c='+c:''))}catch(e){}}
 return ch}
 /* ===== الدوام وقفل الرصد وكلمة المرور ===== */
@@ -252,12 +252,13 @@ function repText(){const s=stats(),C=cfg();let t=(C.school?C.school+'\n':'')+'إ
 function cp(t){try{navigator.clipboard.writeText(t).then(()=>{msg='تم النسخ';R()},()=>fb(t))}catch(e){fb(t)}}
 function fb(t){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');msg='تم النسخ'}catch(e){msg='تعذر النسخ'}a.remove();R()}
 function seg(){const c=gcur();return'<div class="seg">'+vg().map(g=>`<button class="${c&&g.id==c.id?'on':''}" onclick="G='${g.id}';K=null;pend='';R()">${esc(g.name)}</button>`).join('')+'</div>'}
-function vEntry(){const g=gcur();let h=`<div class="card"><div class="bar"><button onclick="sh(-1)">اليوم السابق</button><input type="date" value="${D}" onchange="setD(this.value)"><button onclick="sh(1)">اليوم التالي</button><button onclick="setD(td())">اليوم</button></div><div class="mu">${dlabel()}</div></div><div class="card">`;
+function ql(){return QL&&ROLE=='teacher'?QL:''}
+function vEntry(){const Q=ql();if(ROLE=='teacher'&&!Q)return '<div class="card"><div class="msg">📷 امسح رمز QR الخاص بفصلك لبدء رصد الغياب.</div></div>';if(Q){G=Q.split('_')[0];K=Q}const g=gcur();let h=`<div class="card"><div class="bar"><button onclick="sh(-1)">اليوم السابق</button><input type="date" value="${D}" onchange="setD(this.value)"><button onclick="sh(1)">اليوم التالي</button><button onclick="setD(td())">اليوم</button></div><div class="mu">${dlabel()}</div></div><div class="card">`;
 if(!g)return h+'<div class="mu">لا توجد صفوف بعد. يضيفها المدير من الإعدادات.</div></div>';
 if(canW===false)h+='<div class="msg">صلاحيتك عرض فقط، لا يمكنك رصد الغياب.</div>';const lw0=lockWhy(g.id+'_1');if(lw0)h+='<div class="msg">🔒 '+lw0+'</div>';
-h+=pSel();if(!PD)return h+'<div class="msg">اختر الحصة أولًا ثم اختر الفصل لرصد الغياب.</div></div>';h+=seg()+'<div class="chips">';
-for(let n=1;n<=g.count;n++){const k=g.id+'_'+n,L=STU[k]||[],r=ABS[ak(k)],ids=new Set(L.map(s=>s.id)),c=r?r.filter(i=>ids.has(i)).length:0;h+=`<button class="chip ${r?'done':''} ${c?'has':''} ${K==k?'sel':''}" onclick="K='${k}';R()"><b>فصل ${n}</b><small>${r?(c?c+' غائب':'✓ لا غياب'):(L.length?'لم يُرصد':'بلا طلاب')}</small></button>`}
-h+='</div>';
+h+=pSel();if(!PD)return h+'<div class="msg">اختر الحصة أولًا ثم اختر الفصل لرصد الغياب.</div></div>';if(!Q)h+=seg()+'<div class="chips">';
+if(!Q)for(let n=1;n<=g.count;n++){const k=g.id+'_'+n,L=STU[k]||[],r=ABS[ak(k)],ids=new Set(L.map(s=>s.id)),c=r?r.filter(i=>ids.has(i)).length:0;h+=`<button class="chip ${r?'done':''} ${c?'has':''} ${K==k?'sel':''}" onclick="K='${k}';R()"><b>فصل ${n}</b><small>${r?(c?c+' غائب':'✓ لا غياب'):(L.length?'لم يُرصد':'بلا طلاب')}</small></button>`}
+if(!Q)h+='</div>';
 if(K&&K.startsWith(g.id+'_')){const L=STU[K]||[],r=ABS[ak(K)]||[];h+=`<div class="bar"><b>${esc(g.name)} / ${K.split('_')[1]}</b><span class="mu">${L.length} طالب — ${r.filter(i=>L.some(s=>s.id==i)).length} غائب</span><span style="flex:1"></span>${SM?`<button onclick="selAll()">${SEL.size==L.length?'إلغاء التحديد':'تحديد الكل'}</button><button class="d" onclick="bulk(1)">غياب المحدد (${SEL.size})</button><button onclick="bulk(0)">حضور المحدد</button><button onclick="SM=0;SEL.clear();R()">إنهاء</button>`:`<button onclick="SM=1;R()">☑ تحديد</button><button class="d" onclick="setAbs(K,(STU[K]||[]).map(s=>s.id))">الكل غائب</button><button onclick="setAbs(K,[])">لا يوجد غياب</button>`}</div>`;
 if(!L.length)h+='<div class="msg">لا يوجد طلاب في هذا الفصل. يضيفهم المدير من الإعدادات.</div>';
 L.forEach((s,i)=>{const a=r.includes(s.id),c=SEL.has(s.id);h+=`<button class="st ${a?'a':''} ${SM&&c?'sl':''}" onclick="${SM?`sel('${s.id}')`:`tg('${s.id}')`}"><i>${i+1}</i>${SM?`<span class="ck">${c?'☑':'☐'}</span>`:''}${esc(s.name)}${a?'<span class="m">غائب</span>':''}</button>`})}
