@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f6feb">
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="الغياب">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/favicon-32.png">
+<title>إحصائية الغياب اليومي</title>
+<style>
+:root{--bg:#f5f6f8;--card:#fff;--tx:#1b2430;--mu:#6b7686;--bd:#dde1e8;--pr:#1f6feb;--ab:#d93a3a;--ok:#1a9a5a;--sel:#ece6ff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12161c;--card:#1b222b;--tx:#e8ecf2;--mu:#98a3b3;--bd:#2b3441;--pr:#4c8dff;--ab:#ff6b6b;--ok:#3ddc97;--sel:#2a2250;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#12161c;--card:#1b222b;--tx:#e8ecf2;--mu:#98a3b3;--bd:#2b3441;--pr:#4c8dff;--ab:#ff6b6b;--ok:#3ddc97;--sel:#2a2250;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:"Segoe UI",Tahoma,"Noto Naskh Arabic",Arial,sans-serif;font-size:16px}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(520px 260px at 12% 0,rgba(124,77,255,.2),transparent),radial-gradient(460px 260px at 92% 8%,rgba(255,92,168,.16),transparent);animation:drift 10s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translateY(24px) scale(1.06)}}
+.w{max-width:900px;margin:0 auto;padding:12px}
+.hd{display:flex;align-items:center;gap:12px;margin-bottom:10px}.hd h1{margin:0}.hd img{width:58px;height:58px;object-fit:contain;border-radius:12px;background:#fff;box-shadow:0 0 14px rgba(124,77,255,.4)}
+h1{font-size:21px;margin:6px 0 10px;background:linear-gradient(90deg,#6a5cff,#ff5ca8,#6a5cff);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:flow 5s linear infinite}
+.tabs{display:flex;gap:6px;margin-bottom:10px}.tabs button{flex:1}
+button{position:relative;overflow:hidden;font:inherit;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:9px 12px;border-radius:12px;cursor:pointer;transition:transform .18s,box-shadow .25s,border-color .25s}
+button::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.5) 50%,transparent 70%);transform:translateX(120%);transition:transform .6s;pointer-events:none}
+button:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(124,77,255,.35),0 0 0 1px #9b7bff;border-color:#9b7bff}
+button:hover::after{transform:translateX(-120%)}
+button:active{transform:scale(.94)}
+button.on,button.p{background:linear-gradient(135deg,#6a5cff,#b04cff 55%,#ff5ca8);background-size:200% 200%;animation:flow 4s ease infinite;color:#fff;border-color:transparent;box-shadow:0 4px 14px rgba(150,80,255,.45)}
+button.d{color:var(--ab);border-color:var(--ab)}
+button:disabled{opacity:.38;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+button.d:hover{box-shadow:0 6px 16px rgba(217,58,58,.35),0 0 0 1px var(--ab);border-color:var(--ab)}
+@keyframes flow{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+h1{animation-name:flow}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;margin-bottom:12px}
+.bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+input,textarea{font:inherit;background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:10px;padding:8px}
+.seg{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}.seg button{flex:1;min-width:70px}
+.chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px;margin-bottom:10px}
+.chip{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px}
+.chip b{font-size:16px}.chip small{color:var(--mu);font-size:12px}
+.chip.done small{color:var(--ok)}.chip.done.has small{color:var(--ab)}
+.chip.sel{background:var(--sel);border-color:var(--pr);animation:glow 2s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 0 16px rgba(124,77,255,.6)}}
+.st{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--bd);border-radius:10px;margin-bottom:6px;width:100%;text-align:start}
+.st.a{background:color-mix(in srgb,var(--ab) 14%,var(--card));border-color:var(--ab)}
+.st i{font-style:normal;color:var(--mu);min-width:24px}
+.st span.m{margin-inline-start:auto;font-weight:700;color:var(--ab)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:12px}
+.cards div{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px;text-align:center}
+.cards b{display:block;font-size:22px}.cards small{color:var(--mu)}
+.sc{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{padding:7px 6px;border-bottom:1px solid var(--bd);text-align:center;white-space:nowrap}
+th{color:var(--mu);font-weight:600}tr.t td{font-weight:700;background:var(--sel)}
+.names{color:var(--ab);font-size:14px;white-space:normal;text-align:start}
+.mu{color:var(--mu);font-size:14px}
+.row{display:flex;gap:6px;margin-bottom:6px}.row input{flex:1;min-width:0}
+.msg{background:var(--sel);border-radius:10px;padding:8px;margin-bottom:10px;font-size:14px}
+textarea{width:100%;min-height:90px}
+.sp{position:fixed;pointer-events:none;z-index:99;font-size:15px;animation:pop .85s ease-out forwards}
+@keyframes pop{to{transform:translate(var(--dx),var(--dy)) scale(.2) rotate(200deg);opacity:0}}
+@media(prefers-reduced-motion:reduce){*,*::after,body::before{animation:none!important;transition:none!important}.sp{display:none}}
+#pr{display:none}
+@media print{.w{display:none!important}#pr{display:block;color:#000;background:#fff;font-family:Tahoma,Arial,sans-serif}body{background:#fff}body::before{display:none}@page{margin:12mm}}
+:root{--bg:#eef1f7}
+.hd{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:14px 16px;box-shadow:0 8px 28px rgba(31,45,90,.08)}
+.tabs{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:5px;position:sticky;top:0;z-index:5;box-shadow:0 4px 14px rgba(31,45,90,.06)}
+.tabs button{border:0;background:transparent;box-shadow:none}
+.tabs button.on{background:linear-gradient(135deg,#6a5cff,#b04cff 55%,#ff5ca8);background-size:200% 200%}
+.card{box-shadow:0 2px 12px rgba(31,45,90,.06);border-radius:16px}
+th{background:var(--sel);font-size:13px;color:var(--tx)}
+tr:nth-child(even) td{background:color-mix(in srgb,var(--sel) 35%,var(--card))}
+tr.t td{background:var(--sel)}
+td.names{white-space:normal;text-align:start;min-width:190px}
+.nm{display:inline-block;background:color-mix(in srgb,var(--ab) 12%,var(--card));color:var(--ab);border:1px solid color-mix(in srgb,var(--ab) 35%,var(--card));border-radius:999px;padding:2px 10px;margin:2px;font-size:13px}
+.pb{height:6px;border-radius:6px;background:var(--bd);overflow:hidden;margin-bottom:8px}.pb i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#34d399,#f59e0b,#ef4444)}
+.st.sl{border-color:var(--pr);background:var(--sel)}.ck{font-size:18px;color:var(--pr)}
+.row input.cb{flex:none;width:20px;height:20px;margin-top:8px}
+.qg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:8px}.qc{border:1px solid var(--bd);border-radius:12px;padding:8px;text-align:center;background:#fff;color:#000}.qc svg{width:100%;height:auto;display:block}.qc b{display:block;margin-top:4px}
+</style></head><body><div class="w">
+<div class="hd"><img id="lg" alt="" hidden><div><h1 id="ttl">📋 إحصائية الغياب اليومي</h1><div class="mu" id="sub"></div></div></div>
+<div class="tabs"><button id="t-entry" onclick="T='entry';R()">رصد الغياب</button><button id="t-rep" onclick="T='rep';R()">إحصائية اليوم</button><button id="t-man" onclick="T='man';R()" style="display:none">الإعدادات</button><button id="t-conn" onclick="T='conn';R()">الربط</button><button id="t-out" onclick="logout()">خروج</button></div>
+<div id="app"><div class="msg">جارٍ التحميل…</div></div></div>
+<div id="pr"></div>
+<!-- المكتبات: النسخة المحلية في مجلد libs أولًا، وإن لم توجد تُحمَّل من الإنترنت -->
+<script src="libs/xlsx.full.min.js"></script>
+<script src="libs/exceljs.min.js"></script>
+<script src="libs/qrcode.js"></script>
+<script>(function(){var C='https://cdnjs.cloudflare.com/ajax/libs/',w=function(u){document.write('<script src="'+C+u+'"><\/script>')};if(!window.XLSX)w('xlsx/0.18.5/xlsx.full.min.js');if(!window.ExcelJS)w('exceljs/4.4.0/exceljs.min.js');if(!window.qrcode)w('qrcode-generator/1.4.4/qrcode.min.js')})()</script>
+<script>
+const GN={'السادس':6,'السابع':7,'الثامن':8,'التاسع':9},NUM=/^[\d٠-٩۰-۹.\s]+$/;
+const DEFG=()=>({grades:[['g1','السادس',9],['g2','السابع',8],['g3','الثامن',8],['g4','التاسع',8]].map(a=>({id:a[0],name:a[1],count:a[2]})),locked:false});
+let db=1,ready=false,isAdmin=false,canW=true,online=-1,sig='',CFG=null,STU={},ABS={},unsubA=null,T='entry',G=null,K=null,D=td(),pend='',msg='',IMP=null,IS='all',dirty=0,conf={},SEL=new Set(),SM=0,LK=null;
+
+/* ===== طبقة التخزين: Google Sheets (عبر Apps Script) أو وضع محلي ===== */
+const APP_V='2.2 • 2026-11-12';
+let NEWV='';
+const DEF_URL='https://script.google.com/macros/s/AKfycbzrdJE30ZjM-V92FiWHSpmxfMC7PQyEYYmo7vFatNYbPoS2Y15E7Wf6kUHAbLfGyPhPYg/exec',DEF_TOKEN='';/* يمكنك وضع رابط التطبيق والرمز هنا ليعمل الملف مباشرة لكل المعلمين */
+const LS=k=>{try{return localStorage.getItem(k)}catch(e){return null}},LSS=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+let URL_=LS('abs_url')!==null?LS('abs_url'):DEF_URL,TOK=LS('abs_tok')!==null?LS('abs_tok'):DEF_TOKEN,ADM=LS('abs_adm')||'';
+function loc(){try{return JSON.parse(LS('abs_local'))||{}}catch(e){return{}}}
+async function api(body,tries){tries=tries||0;const r=await fetch(URL_,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({token:TOK},body))});const j=await r.json();if(j&&j.error=='busy'&&tries<3){await new Promise(x=>setTimeout(x,1200*(tries+1)+Math.random()*800));return api(body,tries+1)}if(j&&j.error){const e=new Error(j.error);e.code=j.error;throw e}return j}
+async function load(){if(URL_)return api({action:'load',date:D});const o=loc(),m={};Object.keys(o.absence||{}).forEach(x=>{if(x.startsWith(D+'|'))m[x.split('|')[1]]=o.absence[x]});return{config:o.config||null,students:o.students||{},absence:m}}
+async function put(op){if(URL_)return api(op);const o=loc();if(op.action=='set'){if(op.key=='config')o.config=op.value;else{o.students=o.students||{};o.students[op.key.slice(9)]=op.value.list||[]}}else{o.absence=o.absence||{};o.absence[op.date+'|'+op.key]=op.ids}LSS('abs_local',JSON.stringify(o))}
+async function pull(){const d=D;try{const j=await load();if(d!==D)return;let c=busy('cfg')?CFG:(j.config?cl(j.config):null);const m={};Object.keys(j.students||{}).forEach(k=>{m[k]=cl(j.students[k])});for(const k in STU)if(busy('s'+k))m[k]=STU[k];const a={};Object.keys(j.absence||{}).forEach(k=>{a[k.indexOf('@')<0?k+'@1':k]=(j.absence[k]||[]).slice()});for(const k in ABS)if(busy('a'+D+k))a[k]=ABS[k];
+const ns=JSON.stringify([c,m,a,j.role,j.grade]);const was=online;online=1;if(ns!==sig||was!==1){sig=ns;setRole(j.role,j.grade);CFG=c;STU=m;ABS=a;dr()}}catch(e){if(e&&e.code=='auth'){TOK='';LSS('abs_tok','');setRole('');GATE=1;sig='';msg='كلمة المرور غير صحيحة أو تم تغييرها، سجّل الدخول من جديد';R();return}if(online!==0){msg='تعذر الاتصال بـ Google Sheets، تحقق من الإنترنت ومن الرابط';online=0;dr()}}}
+function isNative(){return !!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform())}
+function isStandalone(){return !!((window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true||isNative())}
+async function saveFile(name,data){const b=data instanceof Blob?data:new Blob([data],{type:/\.html$/i.test(name)?'text/html;charset=utf-8':'application/octet-stream'});
+if(isNative()){try{const b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=rej;r.readAsDataURL(b)});const P=Capacitor.Plugins,w=await P.Filesystem.writeFile({path:name,data:b64,directory:'CACHE'});await P.Share.share({title:name,url:w.uri,dialogTitle:'حفظ أو مشاركة الملف'})}catch(e){msg='تعذر حفظ الملف';R()}return}
+const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),5000)}
+function doPrint(){if(isNative()){const html='<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{font-family:Tahoma,Arial,sans-serif;margin:16px;color:#000}</style></head><body>'+document.getElementById('pr').innerHTML+'</body></html>';saveFile('absence-print-'+D+'.html',html);msg='شارِك الملف ثم افتحه في المتصفح واطبعه';R();return}window.print()}
+let INST=null;addEventListener('beforeinstallprompt',e=>{e.preventDefault();INST=e;try{R()}catch(x){}});
+function verTag(){return (NEWV?'<div class="msg" style="margin-top:10px">يتوفر إصدار أحدث ('+esc(NEWV)+') <a href="#" onclick="forceUpdate();return false">حدّث الآن</a></div>':'')+'<div class="mu" style="margin-top:10px;text-align:center">الإصدار '+APP_V+(isNative()?'':' • <a href="#" onclick="forceUpdate();return false">🔄 تحديث التطبيق</a>')+'</div>'}
+async function checkVer(){if(isNative()||!/^https?:$/.test(location.protocol))return;try{const r=await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'}),t=await r.text(),m=/const APP_V='([^']+)'/.exec(t);if(m&&m[1]!==APP_V){let first=true;try{const k='abs_rl_'+m[1];first=!sessionStorage.getItem(k);sessionStorage.setItem(k,'1')}catch(e){}if(first){forceUpdate()}else{NEWV=m[1];dr()}}}catch(e){}}
+async function forceUpdate(){try{if('serviceWorker' in navigator){const rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(r=>r.unregister()))}if(window.caches){const ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)))}}catch(e){}location.replace(location.pathname+'?v='+Date.now()+location.hash)}
+function instCard(){if(isStandalone())return'';if(INST)return'<div class="card"><b>📲 تثبيت التطبيق</b><div class="mu" style="margin:6px 0">ثبّت الأداة على شاشتك الرئيسية لتفتح كتطبيق.</div><div class="bar"><button class="p" onclick="doInstall()">تثبيت</button></div></div>';if(/iphone|ipad|ipod/i.test(navigator.userAgent))return'<div class="card"><b>📲 تثبيت على الآيفون</b><div class="mu" style="margin-top:6px">في Safari اضغط زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</div></div>';return''}
+async function doInstall(){if(!INST)return;INST.prompt();try{await INST.userChoice}catch(e){}INST=null;R()}
+async function migrate(){if(!isAdmin)return;const j=await load();if(j.config||Object.keys(j.students||{}).length)return;const o=loc();if(!o.config&&!Object.keys(o.students||{}).length)return;if(o.config)await api({action:'set',key:'config',value:o.config});for(const k in o.students||{})await api({action:'set',key:'students_'+k,value:{list:o.students[k]}});msg+=' — تم نقل بيانات هذا الجهاز إلى الجدول'}
+async function saveConn(){const u=nn(document.getElementById('cu').value),t=document.getElementById('ct').value;URL_=u;TOK=t;LSS('abs_url',u);LSS('abs_tok',t);LSS('abs_rem','1');sig='';online=-1;msg='';
+if(!u){msg='أدخل رابط تطبيق Google Sheets';R();return}
+try{const j=await load();setRole(j.role,j.grade);GATE=0;msg='تم الاتصال بنجاح — الصلاحية: '+RN[ROLE];await migrate()}catch(e){msg=e&&e.code=='auth'?'كلمة المرور غير صحيحة':'تعذر الاتصال بالرابط، تأكد من نشر التطبيق ومن صحة الرابط'}
+await pull();R()}
+function vConn(){return `<div class="card"><b>الربط مع Google Sheets</b><div class="mu" style="margin:6px 0">${URL_?(online===1?'✅ متصل بالجدول — الصلاحية الحالية: '+(RN[ROLE]||'—'):'⚠️ الرابط محفوظ لكن الاتصال غير ناجح حاليًا.'):'أدخل رابط تطبيق Google Sheets (Apps Script) وكلمة المرور لبدء الاستخدام.'}</div><div class="row"><input id="cu" dir="ltr" placeholder="رابط تطبيق الويب (Apps Script)" value="${esc(URL_)}"></div><div class="row"><input id="ct" dir="ltr" type="password" placeholder="كلمة المرور" value="${esc(TOK)}"></div><div class="bar"><button class="p" onclick="saveConn()">حفظ واختبار الاتصال</button></div><div class="mu">تحدد كلمة المرور الصلاحية: معلم (رصد فقط)، مشرف (رصد وإحصائيات)، مدير (صلاحيات كاملة).</div>${verTag()}</div>`}
+
+/* ===== رموز QR للفصول ===== */
+let QR=0,GATE=0,LSIG='',ROLE='',PD=0,SUPG='',RG={g:'',from:'',to:'',data:null};const RN={admin:'مدير',sup:'مشرف',teacher:'معلم'};
+function setRole(r,g){ROLE=r||'';SUPG=ROLE=='sup'?(g||''):'';isAdmin=ROLE=='admin'}
+function canStat(){return ROLE=='admin'||ROLE=='sup'}
+function pwCard(){const f=(r,l)=>`<div class="row"><b style="min-width:80px">${l}</b><input id="pw_${r}" type="password" dir="ltr" autocomplete="new-password" placeholder="كلمة مرور جديدة"><button onclick="setPw('${r}')">حفظ</button></div>`;return `<div class="card"><b>🔑 كلمات المرور</b><div class="mu" style="margin:6px 0">غيّر كلمة مرور أي دور. مشرف الصف يستلم صفًا كاملًا فقط (يرصد ويرى إحصائياته). تُحفظ في الخادم، ومن يستخدم الكلمة القديمة يُطلب منه الدخول من جديد. 4 أحرف على الأقل، ويجب أن تكون الكلمات الثلاث مختلفة.</div>${f('teacher','المعلم')}${f('sup','مشرف عام (كل الصفوف)')}${cfg().grades.map(g=>f('sup:'+g.id,'مشرف '+esc(g.name))).join('')}${f('admin','المدير')}</div>`}
+async function setPw(r){const v=document.getElementById('pw_'+r).value.trim();if(v.length<4){msg='كلمة المرور قصيرة (4 أحرف على الأقل)';R();return}
+try{await api({action:'setpw',target:r,value:v});if(r=='admin'){TOK=v;if(LS('abs_rem')==='1')LSS('abs_tok',v)}msg='تم تغيير كلمة المرور'}catch(e){msg=e&&e.code=='dup'?'هذه الكلمة مستخدمة لدور آخر، اختر كلمة مختلفة':e&&e.code=='admin'?'تغيير كلمات المرور للمدير فقط':'تعذر الحفظ، تحقق من الاتصال وحدّث Code.gs'}R()}
+
+/* ===== الحصص: رصد لكل حصة، سجل الفصل اليومي، كشف الصف حسب الأيام ===== */
+function NP(){return Math.max(1,Math.min(12,+cfg().periods||7))}
+function SP(){return Math.max(1,Math.min(NP(),parseInt(cfg().statP)||1))}
+const ORD=['','الأولى','الثانية','الثالثة','الرابعة','الخامسة','السادسة','السابعة','الثامنة','التاسعة','العاشرة','الحادية عشرة','الثانية عشرة'];function pn(p){return 'الحصة '+(ORD[p]||p)}
+let SV=0;function VM(){return isAdmin?NP():SP()}function VP(){return Math.min(SV||SP(),VM())}
+function ak(k,p){return k+'@'+(p||PD)}
+function vg(){return cfg().grades.filter(g=>!SUPG||g.id==SUPG)}
+function dlong(d){try{return new Date(d+'T12:00:00').toLocaleDateString('ar-KW',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}catch(e){return d}}
+function setNP(v){v=Math.max(1,Math.min(12,parseInt(v)||7));mut(c=>{c.periods=v})}
+function setSP(v){v=Math.max(1,Math.min(NP(),parseInt(v)||1));SV=0;mut(c=>{c.statP=v})}
+/* ===== اختصار الأسماء في الطباعة والتصدير ===== */
+const NPRE=['عبد','عبدال','ابو','أبو','أبا','ابا','بن','بنت','ابن','آل','ال'],NSUF=['الله','الدين','الرحمن','الرحيم'];
+function nTok(n){const w=nn(n).split(' ').filter(Boolean),o=[];for(let i=0;i<w.length;i++){let t=w[i];while(i+1<w.length&&(NPRE.indexOf(t.split(' ').pop())>=0||NSUF.indexOf(w[i+1])>=0))t+=' '+w[++i];o.push(t)}return o}
+function NM(){const v=+cfg().nameParts;return v==2||v==3?v:0}
+function SN(n){const k=NM();if(!k)return n;const t=nTok(n);return t.length>k?t.slice(0,k).join(' '):nn(n)}
+function setNM(v){mut(c=>{c.nameParts=+v==2||+v==3?+v:0})}
+function nmCard(){const v=NM(),ex='محمد عبد الله سعد الشمري';return '<div class="card"><b>الأسماء في الطباعة</b><div class="mu" style="margin:6px 0">يُطبَّق على الطباعة وملفات Excel ونص الواتساب. الأسماء على الشاشة وفي قوائم الطلاب تبقى كاملة.</div><div class="seg">'+[[0,'الاسم كاملًا'],[2,'الاسم واسم الأب'],[3,'الاسم الثلاثي']].map(a=>'<button class="'+(v==a[0]?'on':'')+'" onclick="setNM('+a[0]+')">'+a[1]+'</button>').join('')+'</div><div class="mu">مثال: «'+ex+'» ← «'+esc(SN(ex))+'»</div></div>'}
+function perCard(){return '<div class="card"><b>الحصص اليومية</b><div class="mu" style="margin:6px 0">يختار المعلم الحصة قبل رصد الغياب، ويُسجَّل غياب كل فصل في كل حصة على مدار اليوم. الحصة المختارة للإحصائية هي ما يظهر عند فتح صفحة الإحصائية، ويستطيع المشرف عرض هذه الحصة وما قبلها فقط (المدير يرى كل الحصص).</div><div class="bar"><span class="mu">عدد الحصص في اليوم</span><input type="number" min="1" max="12" value="'+NP()+'" style="width:84px" onchange="setNP(this.value)"><span class="mu">الإحصائية من</span><select onchange="setSP(this.value)">'+[...Array(NP())].map((_,i)=>'<option value="'+(i+1)+'" '+(SP()==i+1?'selected':'')+'>'+pn(i+1)+'</option>').join('')+'</select></div></div>'}
+function pSel(){return '<div class="mu" style="margin:6px 0 4px">الحصة</div><div class="seg">'+[...Array(NP())].map((_,i)=>'<button class="'+(PD==i+1?'on':'')+'" onclick="PD='+(i+1)+';R()">'+(i+1)+'</button>').join('')+'</div>'}
+function amOf(date,src){return src?((RG.data||{})[date]||{}):ABS}
+function cpData(g,n,am){const k=g.id+'_'+n,L=STU[k]||[],P=NP(),rec=[],ab=[],cnt=[];for(let p=1;p<=P;p++){const r=am[k+'@'+p];rec[p]=!!r;ab[p]=new Set(r||[]);cnt[p]=L.filter(x=>ab[p].has(x.id)).length}
+const rows=L.map((x,i)=>({i:i+1,s:x,m:[...Array(P)].map((_,j)=>ab[j+1].has(x.id))})).filter(x=>x.m.some(Boolean));return{k,L,P,rec,cnt,rows}}
+function cpTable(g,n,am){const d=cpData(g,n,am),P=d.P;let h='<table class="ptb"><tr><th style="width:6%">م</th><th>اسم الطالب</th>';for(let p=1;p<=P;p++)h+='<th style="width:'+Math.floor(50/P)+'%">ح'+p+'</th>';h+='<th style="width:9%">المجموع</th></tr>';
+if(!d.rows.length)h+='<tr><td colspan="'+(P+3)+'">'+(d.rec.some(Boolean)?'لا يوجد غياب مسجل':'لم يُرصد أي حصة')+'</td></tr>';
+d.rows.forEach(x=>{h+='<tr><td>'+x.i+'</td><td class="n">'+esc(SN(x.s.name))+'</td>';x.m.forEach((a,j)=>{h+='<td style="text-align:center;font-weight:700">'+(d.rec[j+1]?(a?'غ':''):'—')+'</td>'});h+='<td style="text-align:center;font-weight:700">'+x.m.filter(Boolean).length+'</td></tr>'});
+h+='<tr class="tot"><td colspan="2" class="n">عدد الغائبين</td>';for(let p=1;p<=P;p++)h+='<td>'+(d.rec[p]?d.cnt[p]:'—')+'</td>';h+='<td></td></tr><tr class="tot"><td colspan="2" class="n">الحاضرون</td>';for(let p=1;p<=P;p++)h+='<td>'+(d.rec[p]?d.L.length-d.cnt[p]:'—')+'</td>';return h+'<td></td></tr></table>'}
+function cpScreen(g,n,date,src){const b=canStat()?'<button onclick="cpPrint(\''+g.id+'\','+n+',\''+date+'\','+(src?1:0)+')">🖨 طباعة</button><button onclick="cpXl(\''+g.id+'\','+n+',\''+date+'\','+(src?1:0)+')">📊 Excel</button>':'';return '<div class="card"><div class="bar" style="margin-bottom:6px"><b>سجل الحصص — '+esc(g.name)+' / فصل '+n+' — '+date+'</b><span style="flex:1"></span>'+b+'</div><div class="sc">'+cpTable(g,n,amOf(date,src))+'</div></div>'}
+function cpPage(it){const C=cfg();return `<section class="pgb"><div class="ph">${C.logo?`<img src="${C.logo}" alt="">`:''}<div><div class="pt">${esc(C.school||'سجل الغياب بالحصص')}</div><div>${esc(it.g.name)} — فصل ${it.n} — ${it.date}</div><div>${dlong(it.date)}</div></div></div>${cpTable(it.g,it.n,it.am)}<div class="sg"><span>مدير المدرسة: ${esc(C.principal||'..............')}</span><span>التوقيع: ..............</span></div></section>`}
+function prItems(items){if(!items.length){msg='لا توجد بيانات للطباعة';R();return}document.getElementById('pr').innerHTML='<style>'+PCSS+'</style>'+items.map(cpPage).join('');try{doPrint()}catch(e){msg='تعذرت الطباعة';R()}}
+function cpItem(gid,n,date,src){return{g:cfg().grades.find(x=>x.id==gid),n:+n,date,am:amOf(date,src)}}
+function cpPrint(gid,n,date,src){prItems([cpItem(gid,n,date,src)])}
+function cpXl(gid,n,date,src){xlItems([cpItem(gid,n,date,src)],'absence-'+date+'-'+gid+'-'+n)}
+function rgDates(){const a=[];let d=RG.from;while(d&&d<=RG.to&&a.length<62){a.push(d);const x=new Date(d+'T12:00:00');x.setDate(x.getDate()+1);d=fmt(x)}return a}
+function rgItems(){const g=cfg().grades.find(x=>x.id==RG.g);if(!g||!RG.data)return[];const out=[];rgDates().forEach(d=>{const am=RG.data[d]||{};for(let n=1;n<=g.count;n++){const k=g.id+'_'+n;if(Object.keys(am).some(x=>x.indexOf(k+'@')==0))out.push({g,n,date:d,am})}});return out}
+async function rgGo(){const g=document.getElementById('rg_g').value;let f=document.getElementById('rg_f').value||D,t=document.getElementById('rg_t').value||f;if(t<f){const x=f;f=t;t=x}
+if((new Date(t)-new Date(f))/864e5>61){msg='الفترة أكبر من 62 يومًا، قلّصها';R();return}RG.g=g;RG.from=f;RG.to=t;
+try{const j=await api({action:'range',from:f,to:t}),m={};(j.rows||[]).forEach(x=>{const k=x.k.indexOf('@')<0?x.k+'@1':x.k;(m[x.d]=m[x.d]||{})[k]=x.ids});RG.data=m}catch(e){RG.data=null;msg=e&&e.code=='admin'?'عرض الإحصائيات للمشرف والمدير فقط':'تعذر جلب البيانات، تأكد من تحديث Code.gs ونشر نسخة جديدة'}R()}
+function rgPrint(){prItems(rgItems())}
+function rgXl(){xlItems(rgItems(),'absence-'+RG.g+'-'+RG.from+'_'+RG.to)}
+function rgCard(){const gs=vg(),sel=RG.g&&gs.some(g=>g.id==RG.g)?RG.g:(gs[0]||{}).id;let h='<div class="card"><b>كشف الصف حسب الأيام</b><div class="mu" style="margin:6px 0">اختر الصف والفترة لعرض غياب فصوله حصة بحصة لكل يوم، جاهزًا للطباعة (صفحة لكل فصل في كل يوم).</div><div class="bar"><select id="rg_g">'+gs.map(g=>'<option value="'+g.id+'" '+(g.id==sel?'selected':'')+'>'+esc(g.name)+'</option>').join('')+'</select><span class="mu">من</span><input id="rg_f" type="date" value="'+(RG.from||D)+'"><span class="mu">إلى</span><input id="rg_t" type="date" value="'+(RG.to||RG.from||D)+'"><button class="p" onclick="rgGo()">عرض</button></div></div>';
+if(RG.data){const it=rgItems();h+=it.length?'<div class="card"><div class="bar"><b>'+it.length+' صفحة</b><span style="flex:1"></span><button onclick="rgPrint()">🖨 طباعة الكل</button><button onclick="rgXl()">📊 Excel</button></div></div>'+it.map(x=>cpScreen(x.g,x.n,x.date,1)).join(''):'<div class="card"><div class="msg">لا توجد بيانات مرصودة لهذه الفترة.</div></div>'}return h}
+async function xlItems(items,fname){if(!window.ExcelJS){msg='تعذر تحميل مكتبة التصدير، تأكد من الاتصال بالإنترنت';R();return}if(!items.length){msg='لا توجد بيانات للتصدير';R();return}
+try{const C=cfg(),wb=new ExcelJS.Workbook(),used=new Set(),F='Tahoma',bd={style:'thin',color:{argb:'FF9CA3AF'}},B={top:bd,left:bd,bottom:bd,right:bd},fl=a=>({type:'pattern',pattern:'solid',fgColor:{argb:a}}),LT='FFEDE9FE';
+items.forEach(it=>{const d=cpData(it.g,it.n,it.am),P=d.P,cols=P+3,ws=wb.addWorksheet(snm(it.g.name.slice(0,12)+' '+it.n+' '+it.date,used),{views:[{rightToLeft:true,state:'frozen',ySplit:4}],pageSetup:{paperSize:9,orientation:'portrait',fitToPage:true,fitToWidth:1,fitToHeight:0,horizontalCentered:true}});
+ws.getColumn(1).width=6;ws.getColumn(2).width=34;for(let i=0;i<P;i++)ws.getColumn(3+i).width=7;ws.getColumn(cols).width=10;
+[[C.school||'سجل الغياب بالحصص',26,{bold:true,size:16,color:{argb:'FF1F2D5A'}}],[it.g.name+' — فصل '+it.n+' — '+it.date,22,{bold:true,size:13,color:{argb:'FF5B4BDB'}}],[dlong(it.date),20,{size:11,color:{argb:'FF6B7280'}}]].forEach((a,i)=>{ws.mergeCells(i+1,1,i+1,cols);const c=ws.getCell(i+1,1);c.value=a[0];c.font=Object.assign({name:F},a[2]);c.alignment={horizontal:'center',vertical:'middle'};ws.getRow(i+1).height=a[1]});
+const cell=(r,c,v,o)=>{o=o||{};const x=ws.getCell(r,c);x.value=v;x.font={name:F,size:11,bold:!!o.b,color:{argb:o.col||'FF111827'}};x.alignment={horizontal:o.l?'right':'center',vertical:'middle',wrapText:true};x.border=B;if(o.f)x.fill=fl(o.f)};
+['م','اسم الطالب'].concat([...Array(P)].map((_,i)=>'ح'+(i+1)),['المجموع']).forEach((t,i)=>cell(4,i+1,t,{b:1,col:'FFFFFFFF',f:'FF5B4BDB'}));ws.getRow(4).height=26;let r=5;
+if(!d.rows.length){ws.mergeCells(r,1,r,cols);cell(r,1,d.rec.some(Boolean)?'لا يوجد غياب مسجل':'لم يُرصد أي حصة');r++}
+d.rows.forEach((x,i)=>{const f=i%2?'FFF8F7FF':'FFFFFFFF';cell(r,1,x.i,{f});cell(r,2,SN(x.s.name),{f,l:1});x.m.forEach((a,j)=>cell(r,3+j,d.rec[j+1]?(a?'غ':''):'—',{f,b:a,col:a?'FFB91C1C':null}));cell(r,cols,x.m.filter(Boolean).length,{f,b:1});r++});
+[['عدد الغائبين',p=>d.rec[p]?d.cnt[p]:'—'],['الحاضرون',p=>d.rec[p]?d.L.length-d.cnt[p]:'—']].forEach(a=>{ws.mergeCells(r,1,r,2);cell(r,1,a[0],{b:1,f:LT,l:1});cell(r,2,null,{f:LT});for(let p=1;p<=P;p++)cell(r,2+p,a[1](p),{b:1,f:LT});cell(r,cols,'',{f:LT});r++})});
+const buf=await wb.xlsx.writeBuffer();saveFile(fname+'.xlsx',new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));msg='تم تجهيز ملف Excel';R()}catch(e){msg='تعذر التصدير';R()}}
+let MVT='';
+function mvBar(){const C=cfg();let o='<option value="">نقل المحدد إلى…</option>';C.grades.forEach(g=>{for(let n=1;n<=g.count;n++){const k=g.id+'_'+n;if(k!==K)o+='<option value="'+k+'" '+(MVT==k?'selected':'')+'>'+esc(g.name)+' / فصل '+n+'</option>'}});return '<div class="bar"><select onchange="MVT=this.value">'+o+'</select><button onclick="mvSel()">نقل ('+SEL.size+')</button></div>'}
+function mvSel(){if(!isAdmin)return;if(!SEL.size){msg='حدد طلابًا أولًا';R();return}if(!MVT||MVT==K){msg='اختر الفصل المنقول إليه';R();return}const t=MVT,mv=(STU[K]||[]).filter(x=>SEL.has(x.id));STU[K]=(STU[K]||[]).filter(x=>!SEL.has(x.id));STU[t]=(STU[t]||[]).concat(mv);SEL.clear();MVT='';sw(K);sw(t);const g=cfg().grades.find(x=>x.id==t.split('_')[0]);msg='تم نقل '+mv.length+' طالب إلى '+(g?g.name:'')+' / فصل '+t.split('_')[1];R()}
+function logout(){TOK='';setRole('');LSS('abs_tok','');LSS('abs_rem','0');GATE=1;sig='';ABS={};STU={};CFG=null;R()}
+function BASE(){const b=LS('abs_base');if(b)return b;return /^https?:/.test(location.href)?location.href.replace(/#.*$/,''):''}
+function qrUrl(k){let h='c='+k;if(URL_)h+='&u='+encodeURIComponent(URL_);return BASE().replace(/#.*$/,'')+'#'+h}
+function qrSvg(t){const q=qrcode(0,'M');q.addData(t);q.make();const n=q.getModuleCount(),m=2;let d='';for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(q.isDark(r,c))d+='M'+(c+m)+','+(r+m)+'h1v1h-1z';const z=n+2*m;return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+z+' '+z+'" shape-rendering="crispEdges"><rect width="'+z+'" height="'+z+'" fill="#fff"/><path d="'+d+'" fill="#000"/></svg>'}
+function qrGrid(){if(!window.qrcode)return'<div class="msg">تعذر تحميل مكتبة QR، تأكد من الاتصال بالإنترنت</div>';let h='<div class="qg">';cfg().grades.forEach(g=>{for(let n=1;n<=g.count;n++)h+='<div class="qc">'+qrSvg(qrUrl(g.id+'_'+n))+'<b>'+esc(g.name)+' / '+n+'</b></div>'});return h+'</div>'}
+function prQR(){const C=cfg();if(!window.qrcode){msg='تعذر تحميل مكتبة QR، تأكد من الاتصال بالإنترنت';R();return}const cards=[];C.grades.forEach(g=>{for(let n=1;n<=g.count;n++)cards.push('<div class="qc">'+qrSvg(qrUrl(g.id+'_'+n))+'<b>'+esc(g.name)+' / '+n+'</b></div>')});const PER=9;let h='<style>.qpg{page-break-after:always;break-after:page;page-break-inside:avoid;break-inside:avoid;overflow:hidden}.qpg:last-child{page-break-after:auto;break-after:auto}.qg{display:grid;grid-template-columns:repeat(3,1fr);gap:5mm}.qc{border:1px solid #888;border-radius:6px;padding:3mm;text-align:center;page-break-inside:avoid;break-inside:avoid;color:#000;background:#fff;overflow:hidden}.qc svg{display:block;width:48mm;height:48mm;margin:0 auto}.qc b{display:block;font-size:15px;margin-top:2mm}.qt{text-align:center;margin:0 0 4mm;font-size:18px}</style>';for(let p=0;p<cards.length;p+=PER){h+='<div class="qpg">'+(p===0?'<h2 class="qt">'+esc(C.school||'رموز QR لرصد الغياب')+'</h2>':'')+'<div class="qg">'+cards.slice(p,p+PER).join('')+'</div></div>'}document.getElementById('pr').innerHTML=h;try{doPrint()}catch(e){msg='تعذرت الطباعة';R()}}
+function qrCard(){const b=BASE();let h='<div class="card"><b>رموز QR للفصول</b><div class="mu" style="margin:6px 0">كل رمز يفتح صفحة رصد فصله مباشرة، ويُطلب من المعلم إدخال كلمة المرور عند المسح. اطبعها وسلّم كل معلم رمز فصله.</div><div class="row"><input dir="ltr" placeholder="رابط الأداة بعد رفعها على الاستضافة" value="'+esc(b)+'" onchange="LSS(\'abs_base\',nn(this.value));R()"></div>';
+if(!/^https?:/.test(b))h+='<div class="msg">الـ QR لا يعمل مع ملف على الجهاز. ارفع الأداة على استضافة والصق رابطها أعلاه.</div>';
+else{h+='<div class="bar"><button class="p" onclick="QR=!QR;R()">'+(QR?'إخفاء الرموز':'عرض الرموز')+'</button><button onclick="prQR()">🖨 طباعة كل الرموز</button></div>';if(QR)h+=qrGrid()}
+return h+'</div>'}
+function applyHash(){const h=location.hash.slice(1);if(!h)return false;const p=new URLSearchParams(h),old=URL_;let ch=false;
+if(p.get('u')&&p.get('u')!==URL_){URL_=p.get('u');LSS('abs_url',URL_);ch=true}
+const c=p.get('c');if(c&&/^[\w-]+_\d+$/.test(c)){K=c;G=c.split('_')[0];T='entry';GATE=URL_&&(LS('abs_rem')!=='1'||URL_!==old)?1:0}
+if(ch||c){try{history.replaceState(null,'',location.pathname+location.search+(c?'#c='+c:''))}catch(e){}}
+return ch}
+/* ===== الدوام وقفل الرصد وكلمة المرور ===== */
+const SH={m:'الصباحي',e:'المسائي'};
+function gsh(id){const g=cfg().grades.find(x=>x.id==id);return g&&g.shift=='e'?'e':'m'}
+function isWk(d){const w=new Date(d+'T12:00:00').getDay();return w==5||w==6}
+function tms(s){const t=(cfg().times||{})[s];return t&&t[0]&&t[1]?t:{m:['07:00','12:30'],e:['12:30','18:00']}[s]}
+function stm(s,i,v){const w=tms(s).slice();w[i]=v;if(w[0]&&w[1]&&w[1]<=w[0]){msg='وقت النهاية يجب أن يكون بعد وقت البداية';R();return}mut(c=>{c.times=c.times||{};c.times[s]=w})}
+function lockWhy(k){if(isAdmin)return'';if(isWk(D))return'الجمعة والسبت: الرصد متاح للمدير فقط';const s=gsh(String(k).split('_')[0]),a=cfg().att||{};if(a[s]===0)return'الرصد مقفل حاليًا للدوام '+SH[s]+'، يفتحه المدير';const w=tms(s),n=kw();if(D!==n.d)return'الرصد للمعلمين متاح لتاريخ اليوم فقط';if(n.t<w[0]||n.t>=w[1])return'الدوام '+SH[s]+' من '+w[0]+' إلى '+w[1]+': الرصد متاح خلال هذا الوقت فقط';return''}
+function togAtt(s){mut(c=>{c.att=c.att||{};c.att[s]=c.att[s]===0?1:0})}
+function gsf(i,v){mut(c=>{c.grades[i].shift=v=='e'?'e':'m'})}
+function attCard(){const a=cfg().att||{};let h='<div class="card"><b>أوقات الدوام والرصد</b><div class="mu" style="margin:6px 0">لكل دوام وقت بداية ونهاية بتوقيت الكويت، ويرصد المعلم لتاريخ اليوم خلال هذا الوقت فقط. يمكنك أيضًا قفل الدوام يدويًا. الجمعة والسبت للمدير فقط. حدّد دوام كل صف من قائمة الصفوف أدناه.</div>';
+['m','e'].forEach(x=>{const w=tms(x),o=a[x]!==0;h+='<div class="bar" style="margin-bottom:6px"><b style="min-width:92px">الدوام '+SH[x]+'</b><span class="mu">من</span><input type="time" value="'+w[0]+'" onchange="stm(\''+x+'\',0,this.value)"><span class="mu">إلى</span><input type="time" value="'+w[1]+'" onchange="stm(\''+x+'\',1,this.value)"><button class="'+(o?'':'p')+'" onclick="togAtt(\''+x+'\')">'+(o?'🟢 مفتوح — اضغط للقفل اليدوي':'🔒 مقفل يدويًا — اضغط للفتح')+'</button></div>'});
+return h+'</div>'}
+function vGate(){return '<div class="card"><b>🔐 تسجيل الدخول</b><div class="mu" style="margin:6px 0">أدخل كلمة المرور. تحدد كلمة المرور صلاحيتك (معلم / مشرف / مدير).</div><div class="row"><input id="gp" type="password" dir="ltr" placeholder="كلمة المرور" onkeydown="if(event.key==\'Enter\')unlock()"></div><label class="mu" style="display:block;margin:6px 0"><input type="checkbox" id="gr"> تذكّر كلمة المرور على هذا الجهاز</label><div class="bar"><button class="p" onclick="unlock()">دخول</button></div>'+verTag()+'</div>'}
+async function unlock(){const p=document.getElementById('gp').value,r=document.getElementById('gr').checked;if(!p)return;TOK=p;let j;
+try{j=await load()}catch(e){TOK='';msg=e&&e.code=='auth'?'كلمة المرور غير صحيحة':'تعذر الاتصال، تحقق من الإنترنت';R();return}
+setRole(j.role,j.grade);GATE=0;LSS('abs_rem',r?'1':'0');LSS('abs_tok',r?p:'');sig='';online=-1;await pull();R()}
+const WQ={},cfg=()=>CFG||DEFG(),busy=i=>WQ[i]&&(WQ[i].b||WQ[i].d),uid=()=>Math.random().toString(36).slice(2,9),nn=s=>String(s).replace(/\s+/g,' ').trim(),cl=o=>JSON.parse(JSON.stringify(o));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function fmt(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function kw(){const o={};new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kuwait',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date()).forEach(x=>{o[x.type]=x.value});return{d:o.year+'-'+o.month+'-'+o.day,t:o.hour+':'+o.minute}}
+function td(){return kw().d}
+function dlabel(){try{return new Date(D+'T12:00:00').toLocaleDateString('ar-KW',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}catch(e){return D}}
+function pc(a,b){return b?(a/b*100).toFixed(1)+'%':'—'}
+function gcur(){const gs=vg();return gs.find(g=>g.id==G)||gs[0]||null}
+function gnm(id){const g=cfg().grades.find(x=>x.id==id);return g?g.name:''}
+function wr(id,ref,get){const q=WQ[id]=WQ[id]||{b:0,d:0};q.d=1;if(q.b)return;q.b=1;(async()=>{try{while(q.d){q.d=0;await ref.set(get())}}catch(e){q.d=0;sig='';setTimeout(pull,300);msg=e&&e.code=='grade'?'تعذر الحفظ: هذا الصف خارج صلاحيتك':e&&e.code=='locked'?'تعذر الحفظ: الرصد مقفل (جمعة/سبت أو دوام مقفل). راجع المدير':e&&e.code=='admin'?'تعذر الحفظ: لا تملك صلاحية المدير (راجع تبويب الربط)':e&&e.code=='auth'?'تعذر الحفظ: رمز الدخول غير صحيح':e&&e.code=='busy'?'الخادم مشغول الآن، أعد الضغط بعد لحظات':'تعذر الحفظ، تحقق من الاتصال'}q.b=0;R()})()}
+function mut(f){if(!CFG)CFG=DEFG();f(CFG);wr('cfg',{set:v=>put({action:'set',key:'config',value:v})},()=>CFG);R()}
+function sw(k){wr('s'+k,{set:v=>put({action:'set',key:'students_'+k,value:v})},()=>({list:STU[k]||[]}))}
+function setAbs(k,a){if(canW===false)return;if(!PD){msg='اختر الحصة أولًا';R();return}const lw=lockWhy(k);if(lw){msg='🔒 '+lw;R();return}const d=D,p=PD,kk=ak(k,p);ABS[kk]=a;wr('a'+d+kk,{set:v=>put(Object.assign({action:'abs'},v))},()=>{const q=k.split('_'),L=STU[k]||[],ids=ABS[kk]||[],st=new Set(ids);return{date:d,key:kk,period:p,ids,grade:gnm(q[0]),cls:+q[1],total:L.length,names:L.filter(x=>st.has(x.id)).map(x=>x.name)}});R()}
+function tg(id){const a=(ABS[ak(K)]||[]).slice(),i=a.indexOf(id);i>=0?a.splice(i,1):a.push(id);setAbs(K,a)}
+function setD(v){D=v||td();K=null;subAbs();R()}
+function sh(n){const d=new Date(D+'T12:00:00');d.setDate(d.getDate()+n);setD(fmt(d))}
+function dr(){const a=document.activeElement;if(a&&/INPUT|TEXTAREA/.test(a.tagName)&&a.type!=='date'){dirty=1;return}R()}
+addEventListener('focusout',()=>{if(dirty){dirty=0;setTimeout(R,400)}});
+const er=e=>{msg='خطأ في الاتصال: '+(e&&e.code||'');R()};
+function subAbs(){ABS={};pull()}
+async function init(){db=1;setTimeout(checkVer,1500);setInterval(checkVer,300000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkVer()});canW=true;applyHash();if(GATE)TOK='';if(URL_&&!TOK)GATE=1;isAdmin=false;
+let LP=Date.now();setInterval(()=>{if(!GATE&&!document.hidden){if(URL_&&(T=='rep'||Date.now()-LP>=30000)){LP=Date.now();pull()}const sg=D+'|'+cfg().grades.map(g=>lockWhy(g.id+'_1')).join('|');if(sg!==LSIG){LSIG=sg;dr()}}},10000);
+addEventListener('hashchange',()=>{const ch=applyHash();if(URL_&&!TOK)GATE=1;if(GATE){TOK='';setRole('');sig='';R();return}if(ch){isAdmin=false;sig='';online=-1;pull().then(R)}else R()});
+if(GATE){ready=true;R();return}
+await pull();ready=true;R()}
+function stats(){const out=[];let tT=0,tA=0,tP=0,rc=0,cc=0;vg().forEach(g=>{const rows=[];let gT=0,gA=0,gP=0;for(let n=1;n<=g.count;n++){const k=g.id+'_'+n,L=STU[k]||[],r=ABS[k+'@'+VP()],ids=new Set(L.map(s=>s.id)),ab=(r||[]).filter(i=>ids.has(i)),names=L.filter(s=>ab.includes(s.id)).map(s=>s.name);const dn=!!r,pp=dn?L.length-ab.length:0;rows.push({n,t:L.length,a:ab.length,p:pp,names,done:dn});gT+=L.length;gA+=ab.length;gP+=pp;if(L.length){cc++;if(r)rc++}}out.push({g,rows,gT,gA,gP});tT+=gT;tA+=gA;tP+=gP});return{out,tT,tA,tP,rc,cc}}
+function repText(){const s=stats(),C=cfg();let t=(C.school?C.school+'\n':'')+'إحصائية الغياب – '+dlabel()+' – '+pn(VP())+'\n';s.out.forEach(o=>{t+='\n'+o.g.name+': '+o.gA+' غائب، '+o.gP+' حاضر، الإجمالي '+o.gT+'\n';o.rows.forEach(r=>{if(r.a)t+='  فصل '+r.n+' ('+r.a+'): '+r.names.map(SN).join('، ')+'\n'})});return t+'\nالإجمالي: '+s.tA+' غائب، '+s.tP+' حاضر، من '+s.tT+' ('+pc(s.tA,s.tA+s.tP)+')'+(C.principal?'\nمدير المدرسة: '+C.principal:'')}
+function cp(t){try{navigator.clipboard.writeText(t).then(()=>{msg='تم النسخ';R()},()=>fb(t))}catch(e){fb(t)}}
+function fb(t){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');msg='تم النسخ'}catch(e){msg='تعذر النسخ'}a.remove();R()}
+function seg(){const c=gcur();return'<div class="seg">'+vg().map(g=>`<button class="${c&&g.id==c.id?'on':''}" onclick="G='${g.id}';K=null;pend='';R()">${esc(g.name)}</button>`).join('')+'</div>'}
+function vEntry(){const g=gcur();let h=`<div class="card"><div class="bar"><button onclick="sh(-1)">اليوم السابق</button><input type="date" value="${D}" onchange="setD(this.value)"><button onclick="sh(1)">اليوم التالي</button><button onclick="setD(td())">اليوم</button></div><div class="mu">${dlabel()}</div></div><div class="card">`;
+if(!g)return h+'<div class="mu">لا توجد صفوف بعد. يضيفها المدير من الإعدادات.</div></div>';
+if(canW===false)h+='<div class="msg">صلاحيتك عرض فقط، لا يمكنك رصد الغياب.</div>';const lw0=lockWhy(g.id+'_1');if(lw0)h+='<div class="msg">🔒 '+lw0+'</div>';
+h+=pSel();if(!PD)return h+'<div class="msg">اختر الحصة أولًا ثم اختر الفصل لرصد الغياب.</div></div>';h+=seg()+'<div class="chips">';
+for(let n=1;n<=g.count;n++){const k=g.id+'_'+n,L=STU[k]||[],r=ABS[ak(k)],ids=new Set(L.map(s=>s.id)),c=r?r.filter(i=>ids.has(i)).length:0;h+=`<button class="chip ${r?'done':''} ${c?'has':''} ${K==k?'sel':''}" onclick="K='${k}';R()"><b>فصل ${n}</b><small>${r?(c?c+' غائب':'✓ لا غياب'):(L.length?'لم يُرصد':'بلا طلاب')}</small></button>`}
+h+='</div>';
+if(K&&K.startsWith(g.id+'_')){const L=STU[K]||[],r=ABS[ak(K)]||[];h+=`<div class="bar"><b>${esc(g.name)} / ${K.split('_')[1]}</b><span class="mu">${L.length} طالب — ${r.filter(i=>L.some(s=>s.id==i)).length} غائب</span><span style="flex:1"></span>${SM?`<button onclick="selAll()">${SEL.size==L.length?'إلغاء التحديد':'تحديد الكل'}</button><button class="d" onclick="bulk(1)">غياب المحدد (${SEL.size})</button><button onclick="bulk(0)">حضور المحدد</button><button onclick="SM=0;SEL.clear();R()">إنهاء</button>`:`<button onclick="SM=1;R()">☑ تحديد</button><button class="d" onclick="setAbs(K,(STU[K]||[]).map(s=>s.id))">الكل غائب</button><button onclick="setAbs(K,[])">لا يوجد غياب</button>`}</div>`;
+if(!L.length)h+='<div class="msg">لا يوجد طلاب في هذا الفصل. يضيفهم المدير من الإعدادات.</div>';
+L.forEach((s,i)=>{const a=r.includes(s.id),c=SEL.has(s.id);h+=`<button class="st ${a?'a':''} ${SM&&c?'sl':''}" onclick="${SM?`sel('${s.id}')`:`tg('${s.id}')`}"><i>${i+1}</i>${SM?`<span class="ck">${c?'☑':'☐'}</span>`:''}${esc(s.name)}${a?'<span class="m">غائب</span>':''}</button>`})}
+else h+='<div class="mu">اختر الفصل لرصد الغياب.</div>';
+h+='</div>';if(K&&K.startsWith(g.id+'_'))h+=cpScreen(g,+K.split('_')[1],D,0);return h}
+function vpBar(s){const m=VM(),v=VP();let h='<div class="mu" style="margin:8px 0 4px">عرض الإحصائية من الحصة</div><div class="seg">'+[...Array(NP())].map((_,i)=>{const p=i+1,off=p>m;return '<button class="'+(p==v?'on':'')+'" '+(off?'disabled title="غير متاحة: حددها المدير حتى '+pn(SP())+'"':'onclick="SV='+p+';R()"')+'>'+p+'</button>'}).join('')+'</div><div class="mu">'+pn(v)+(v==SP()?' (اختيار المدير)':'')+(m<NP()?' — المتاح حتى '+pn(m):'')+'</div>';
+if(!s.rc){const has=[];for(let p=1;p<=NP();p++)if(p!=v&&Object.keys(ABS).some(k=>k.endsWith('@'+p)&&vg().some(g=>k.indexOf(g.id+'_')==0)))has.push(p);if(has.length)h+='<div class="msg" style="margin-top:8px">لا يوجد رصد في '+pn(v)+'، توجد فصول مرصودة في: '+has.map(p=>p<=m?'<a href="#" onclick="SV='+p+';R();return false">'+pn(p)+'</a>':pn(p)).join('، ')+(has.some(p=>p>m)?'. لعرض ما بعد '+pn(m)+' يغيّر المدير حصة الإحصائية من الإعدادات.':'')+'</div>'}return h}
+function vRep(){const s=stats();let h=`<div class="card"><div class="bar noprint"><button onclick="sh(-1)">اليوم السابق</button><input type="date" value="${D}" onchange="setD(this.value)"><button onclick="sh(1)">اليوم التالي</button></div><b>${dlabel()}</b>${vpBar(s)}</div>`;
+h+=`<div class="cards"><div><b>${s.tT}</b><small>إجمالي الطلاب</small></div><div><b style="color:var(--ok)">${s.tP}</b><small>الحاضرون</small></div><div><b style="color:var(--ab)">${s.tA}</b><small>الغائبون</small></div><div><b>${pc(s.tA,s.tA+s.tP)}</b><small>نسبة الغياب</small></div><div><b>${s.rc}/${s.cc}</b><small>فصول تم رصدها</small></div></div>`;
+h+=rgCard();s.out.forEach(o=>{h+=`<div class="card"><div class="bar" style="margin-bottom:6px"><b style="font-size:17px">${esc(o.g.name)}</b><span class="mu">${o.gA} غائب من ${o.gT}</span><span style="flex:1"></span><button class="noprint" onclick="xl('${o.g.id}')">📊 Excel</button><button class="noprint" onclick="pr('${o.g.id}')">🖨 طباعة هذا الصف</button></div><div class="pb"><i style="width:${o.gT?Math.max(o.gA?3:0,o.gA/o.gT*100):0}%"></i></div><div class="sc"><table><tr><th>الفصل</th><th>الإجمالي</th><th>الحضور</th><th>الغياب</th><th>النسبة</th><th>الحالة</th><th style="width:40%">أسماء الغائبين</th><th class="noprint">هذا الفصل</th></tr>`;
+o.rows.forEach(r=>{h+=`<tr><td><b>${r.n}</b></td><td>${r.t}</td><td>${r.done?`<b style="color:var(--ok)">${r.p}</b>`:'—'}</td><td>${r.done?(r.a?`<b style="color:var(--ab)">${r.a}</b>`:0):'—'}</td><td>${r.done?pc(r.a,r.t):'—'}</td><td>${!r.t?'—':r.done?'✓':'لم يُرصد'}</td><td class="names">${r.names.map(n=>`<span class="nm">${esc(n)}</span>`).join('')}</td><td class="noprint"><button style="padding:4px 9px" title="طباعة هذا الفصل" onclick="pr('${o.g.id}',${r.n})">🖨</button> <button style="padding:4px 9px" title="Excel لهذا الفصل" onclick="xl('${o.g.id}',${r.n})">📊</button></td></tr>`});
+h+=`<tr class="t"><td>المجموع</td><td>${o.gT}</td><td>${o.gP}</td><td>${o.gA}</td><td>${pc(o.gA,o.gP+o.gA)}</td><td></td><td></td><td class="noprint"></td></tr></table></div></div>`});
+return h+(cfg().principal?`<div class="card">مدير المدرسة: <b>${esc(cfg().principal)}</b></div>`:'')+'<div class="bar noprint"><button class="p" onclick="cp(repText())">نسخ التقرير (للواتساب)</button><button class="p" onclick="xl()">📊 تصدير Excel</button><button onclick="pr()">🖨 طباعة كل الصفوف</button><button onclick="sv()">💾 حفظ ملف للطباعة</button></div><div class="mu noprint">كل صف يُطبع في صفحة مستقلة. إن لم تظهر نافذة الطباعة فاستخدم «حفظ ملف للطباعة» ثم افتح الملف واطبعه.</div>'}
+function gn(i,v){if(nn(v))mut(c=>{c.grades[i].name=nn(v)})}
+function gc(i,d){const g=cfg().grades[i];if(d<0&&g.count&&(STU[g.id+'_'+g.count]||[]).length&&pend!=='c'+i){pend='c'+i;msg='الفصل الأخير فيه طلاب. اضغط (−) مرة أخرى للتأكيد.';R();return}pend='';mut(c=>{const x=c.grades[i];x.count=Math.max(0,Math.min(30,x.count+d))})}
+function gd(i){if(pend!=='g'+i){pend='g'+i;R();return}pend='';K=null;mut(c=>{c.grades.splice(i,1)})}
+function ga(){mut(c=>{c.grades.push({id:'g'+Date.now().toString(36),name:'صف جديد',count:1})})}
+function lock(){pend='';mut(c=>{c.locked=!c.locked})}
+function addSt(){const t=document.getElementById('nw').value.split('\n').map(nn).filter(Boolean);if(!K||!t.length)return;STU[K]=(STU[K]||[]).concat(t.map(n=>({id:uid(),name:n})));msg='تمت إضافة '+t.length+' طالب';sw(K);R()}
+function rn(id,v){const s=(STU[K]||[]).find(x=>x.id==id);if(s&&nn(v)){s.name=nn(v);sw(K)}}
+function dl(id){if(pend!=='s'+id){pend='s'+id;R();return}pend='';STU[K]=(STU[K]||[]).filter(x=>x.id!=id);sw(K);R()}
+function srt(){STU[K]=(STU[K]||[]).slice().sort((a,b)=>a.name.localeCompare(b.name,'ar'));sw(K);R()}
+function nd(s){return String(s).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d))}
+function gfind(v){v=nn(nd(v||'')).replace(/الصف/g,'').trim();if(!v)return null;const gs=cfg().grades;const g=gs.find(x=>{const t=nd(x.name).replace(/الصف/g,'').trim();return t&&(v.includes(t)||t.includes(v))});if(g)return g;const m=v.match(/\d+/);if(m){const w=Object.keys(GN).find(k=>GN[k]==+m[0]);if(w)return gs.find(x=>x.name.includes(w))||null}return null}
+function pcls(gv,cv,hasG){const t=nd(cv||''),ns=t.match(/\d+/g)||[];let g=hasG?gfind(gv):null;if(!g)g=gfind(t.replace(/\d+/g,' '));if(!g&&ns.length>1)g=gfind(ns[0]);return[g,ns.length?+ns[ns.length-1]:0]}
+function rd(f){if(!f)return;if(!window.XLSX){msg='تعذر تحميل مكتبة الإكسل، تأكد من الاتصال بالإنترنت';R();return}
+const fr=new FileReader(),csv=/\.csv$/i.test(f.name);
+fr.onload=e=>{try{const wb=XLSX.read(e.target.result,{type:csv?'string':'array'}),map={};let skip=0;
+wb.SheetNames.forEach(sn=>{const rows=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,defval:''}).filter(r=>r.some(c=>String(c).trim()));if(!rows.length)return;
+const hd=rows[0].map(c=>String(c).trim()),iN=hd.findIndex(h=>/اسم|الطالب|name/i.test(h)),iG=hd.findIndex(h=>/^(ال)?صف|grade/i.test(h)),iC=hd.findIndex(h=>/فصل|شعبة|section|class/i.test(h)),data=(iN>=0||iG>=0||iC>=0)?rows.slice(1):rows;
+let nc=iN;if(nc<0){const r0=data[0]||[];nc=r0.findIndex((c,i)=>i!==iG&&i!==iC&&String(c).trim()&&!NUM.test(String(c).trim()));if(nc<0)nc=0}
+const sg=pcls('',sn,false);
+let TT=null,TH=-1,NC=-1;for(let i=0;i<Math.min(rows.length,6)&&TH<0;i++){const j=rows[i].findIndex(c=>/^\s*(الاسم|اسم الطالب|name)\s*$/i.test(String(c)));if(j>=0){TH=i;NC=j}}
+if(TH>=0)for(let i=0;i<=TH&&!TT;i++)for(const c of rows[i]){const q=nd(String(c)).match(/(\d+)\s*\/\s*(\d+)/);if(q){TT=[+q[1],+q[2]];break}}
+if(TT&&TH>=0){const body=rows.slice(TH+1);let g,s=TT[1];
+if(IS=='class'){if(!K){skip+=body.length;return}const p=K.split('_');g=cfg().grades.find(x=>x.id==p[0]);s=+p[1]}
+else if(IS=='grade'){g=gcur();const gg=gfind(String(TT[0]));if(!g||!gg||gg.id!=g.id){skip+=body.length;return}}
+else g=gfind(String(TT[0]));
+if(!g||!s||s>30){skip+=body.length;return}
+const k=g.id+'_'+s,m=map[k]=map[k]||{nw:[],dup:0},ex=new Set([...(STU[k]||[]).map(x=>x.name),...m.nw]);
+body.forEach(r=>{const nm=nn(r[NC]==null?'':r[NC]);if(!nm||NUM.test(nm))return;if(ex.has(nm))m.dup++;else{m.nw.push(nm);ex.add(nm)}});return}
+data.forEach(r=>{const nm=nn(r[nc]);if(!nm||NUM.test(nm)){skip++;return}let g,s;
+if(IS=='class'){if(!K){skip++;return}const p=K.split('_');g=cfg().grades.find(x=>x.id==p[0]);s=+p[1]}
+else{const gc0=gcur();if(IS=='grade'&&iG>=0){const gg=gfind(r[iG]);if(gg&&gc0&&gg.id!=gc0.id){skip++;return}}
+if(iG>=0||iC>=0){[g,s]=pcls(iG>=0?r[iG]:'',iC>=0?r[iC]:'',iG>=0&&IS!='grade')}else if(sg[0]&&sg[1]){[g,s]=sg}else if(IS=='grade'&&/\d/.test(nd(sn))){s=+nd(sn).match(/\d+/g).pop();g=gc0}else{skip++;return}
+if(IS=='grade')g=gc0}
+if(!g||!s||s>30){skip++;return}
+const k=g.id+'_'+s,m=map[k]=map[k]||{nw:[],dup:0},ex=new Set([...(STU[k]||[]).map(x=>x.name),...m.nw]);
+if(ex.has(nm))m.dup++;else m.nw.push(nm)})});
+IMP={map,skip}}catch(err){IMP=null;msg='تعذر قراءة الملف'}R()};
+csv?fr.readAsText(f):fr.readAsArrayBuffer(f)}
+function applyImp(){let n=0;const ks=Object.keys(IMP.map),m=IMP.map;IMP=null;mut(c=>{ks.forEach(k=>{const p=k.split('_'),g=c.grades.find(x=>x.id==p[0]);if(g&&+p[1]>g.count)g.count=+p[1];STU[k]=(STU[k]||[]).concat(m[k].nw.map(nm=>({id:uid(),name:nm})));n+=m[k].nw.length;sw(k)})});msg='تم استيراد '+n+' طالب'}
+function impCard(){const g=gcur(),hp={all:'ملف للمدرسة كلها: أعمدة «الصف» و«الفصل» و«الاسم» (اسم الصف يطابق الإعدادات والفصل رقم)، أو اجعل اسم كل ورقة مثل «السادس 1».',grade:'ملف لصف واحد فيه كل فصوله: ورقة لكل فصل وعنوانها «الصف 9 / 1» وتحتها عمود «الاسم» (يُوزَّع كل ورقة على فصلها تلقائيًا)، أو عمود «الفصل» (رقم) و«الاسم». اختر الصف من الأعلى أولًا.',class:'ملف أسماء لفصل واحد: عمود واحد للأسماء أو عمود «الاسم»، ويُضاف كله إلى الفصل المختار.'}[IS],sel=IS=='grade'?'الصف المختار: '+(g?g.name:'—'):IS=='class'?(K&&g&&K.startsWith(g.id+'_')?'الفصل المختار: '+g.name+' / '+K.split('_')[1]:'اختر الفصل من الأعلى أولًا'):'';
+let h='<div class="card"><b>استيراد الطلاب من إكسل</b><div class="seg" style="margin-top:8px">'+[['all','كل المدرسة'],['grade','صف كامل'],['class','فصل واحد']].map(a=>`<button class="${IS==a[0]?'on':''}" onclick="IS='${a[0]}';IMP=null;R()">${a[1]}</button>`).join('')+`</div><div class="mu" style="margin:4px 0">${hp} الأسماء المكررة تُتجاهل.</div>${sel?`<div class="msg">${esc(sel)}</div>`:''}<input type="file" accept=".xlsx,.xls,.csv" onchange="rd(this.files[0])">`;
+if(IMP){const ks=Object.keys(IMP.map).sort(),tot=ks.reduce((a,k)=>a+IMP.map[k].nw.length,0);
+h+=ks.length?`<div class="sc" style="margin-top:8px"><table><tr><th>الفصل</th><th>سيضاف</th><th>مكرر</th></tr>${ks.map(k=>`<tr><td>${esc(gnm(k.split('_')[0]))} / ${k.split('_')[1]}</td><td>${IMP.map[k].nw.length}</td><td>${IMP.map[k].dup}</td></tr>`).join('')}</table></div><div class="mu" style="margin:6px 0">الإجمالي: ${tot} طالب${IMP.skip?' — تم تجاهل '+IMP.skip+' صفًا غير صالح':''}</div><div class="bar"><button class="p" onclick="applyImp()">تأكيد الاستيراد</button><button onclick="IMP=null;R()">إلغاء</button></div>`:'<div class="msg" style="margin-top:8px">لم يُعثر على أسماء صالحة لهذا الخيار. راجع شرح الخيار المختار أعلاه.</div>'}
+return h+'</div>'}
+function sf(k,v){mut(c=>{c[k]=nn(v)})}
+function lg(f){if(!f)return;const r=new FileReader();r.onload=e=>{const im=new Image();im.onload=()=>{let u='';for(const mx of [140,110,80,56]){const s=Math.min(1,mx/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);const x=c.getContext('2d');x.drawImage(im,0,0,c.width,c.height);u=c.toDataURL('image/png');if(u.length>38000){x.globalCompositeOperation='destination-over';x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);u=c.toDataURL('image/jpeg',.8)}if(u.length<=38000)break}if(u.length>40000){msg='الشعار كبير جدًا، اختر صورة أصغر';R();return}mut(x=>{x.logo=u})};im.onerror=()=>{msg='تعذر قراءة الصورة';R()};im.src=e.target.result};r.readAsDataURL(f)}
+function schoolCard(){const C=cfg();return `<div class="card"><b>بيانات المدرسة</b><div style="height:8px"></div><div class="row"><input placeholder="اسم المدرسة" value="${esc(C.school||'')}" onchange="sf('school',this.value)"></div><div class="row"><input placeholder="اسم المدير" value="${esc(C.principal||'')}" onchange="sf('principal',this.value)"></div><div class="bar">${C.logo?`<img src="${C.logo}" alt="" style="width:48px;height:48px;object-fit:contain;border-radius:10px;background:#fff">`:''}<input type="file" accept="image/*" onchange="lg(this.files[0])">${C.logo?`<button class="d" onclick="sf('logo','')">إزالة الشعار</button>`:''}</div></div>`}
+function vMan(){const C=cfg(),lk=C.locked;let h=`<div class="card"><div class="bar"><button class="${lk?'p':''}" onclick="lock()">${lk?'🔒 الإعدادات مقفلة — اضغط للفتح':'🔓 قفل الإعدادات'}</button></div><div class="mu">${lk?'لا يمكن تعديل الصفوف أو الطلاب أثناء القفل. رصد الغياب يعمل بشكل طبيعي.':'بعد الانتهاء من الإعداد اقفل الإعدادات حتى لا تتغير بالخطأ.'}</div></div>`;
+if(lk)return h+attCard()+perCard()+nmCard()+qrCard()+pwCard();
+h+=attCard()+perCard()+nmCard()+schoolCard()+'<div class="card"><b>الصفوف (المراحل) وعدد فصولها</b><div style="height:8px"></div>';
+C.grades.forEach((g,i)=>{h+=`<div class="row"><input value="${esc(g.name)}" onchange="gn(${i},this.value)"><select onchange="gsf(${i},this.value)"><option value="m" ${g.shift!='e'?'selected':''}>صباحي</option><option value="e" ${g.shift=='e'?'selected':''}>مسائي</option></select><button onclick="gc(${i},-1)">−</button><b style="min-width:28px;text-align:center;padding-top:8px">${g.count}</b><button onclick="gc(${i},1)">+</button><button class="d" onclick="gd(${i})">${pend==='g'+i?'تأكيد؟':'حذف'}</button></div>`});
+h+='<button onclick="ga()">+ إضافة صف</button></div><div class="card">'+seg()+'<div class="chips">';
+const g=gcur();
+if(g)for(let n=1;n<=g.count;n++){const k=g.id+'_'+n;h+=`<button class="chip ${K==k?'sel':''}" onclick="K='${k}';pend='';R()"><b>فصل ${n}</b><small>${(STU[k]||[]).length} طالب</small></button>`}
+h+='</div>';
+if(g&&K&&K.startsWith(g.id+'_')){h+=`<b>طلاب ${esc(g.name)} / ${K.split('_')[1]}</b><div class="mu" style="margin:4px 0">اكتب اسمًا في كل سطر لإضافة عدة طلاب معًا.</div><textarea id="nw" placeholder="اسم الطالب"></textarea><div class="bar" style="margin-top:6px"><button class="p" onclick="addSt()">إضافة</button><button onclick="srt()">ترتيب أبجدي</button></div>`;
+const LL=STU[K]||[];if(LL.length)h+=`<div class="bar"><button onclick="selAll()">${SEL.size==LL.length?'إلغاء التحديد':'تحديد الكل'}</button><button class="d" onclick="delSel()">${pend=='ds'?'تأكيد حذف '+SEL.size+'؟':'حذف المحدد ('+SEL.size+')'}</button></div>`+mvBar();
+LL.forEach((s,i)=>{h+=`<div class="row"><input type="checkbox" class="cb" ${SEL.has(s.id)?'checked':''} onchange="sel('${s.id}')"><span class="mu" style="min-width:24px;padding-top:9px">${i+1}</span><input value="${esc(s.name)}" onchange="rn('${s.id}',this.value)"><button class="d" onclick="dl('${s.id}')">${pend==='s'+s.id?'تأكيد؟':'حذف'}</button></div>`})}
+else h+='<div class="mu">اختر فصلًا لإضافة الطلاب وتعديلهم.</div>';
+return h+'</div>'+impCard()+qrCard()+pwCard()}
+function sel(id){pend='';SEL.has(id)?SEL.delete(id):SEL.add(id);R()}
+function selAll(){pend='';const L=STU[K]||[];if(SEL.size==L.length)SEL.clear();else L.forEach(s=>SEL.add(s.id));R()}
+function bulk(v){if(!SEL.size){msg='حدد طلابًا أولًا';R();return}const a=new Set(ABS[ak(K)]||[]);SEL.forEach(id=>v?a.add(id):a.delete(id));SEL.clear();setAbs(K,[...a])}
+function delSel(){if(!SEL.size){msg='حدد طلابًا أولًا';R();return}if(pend!=='ds'){pend='ds';R();return}pend='';STU[K]=(STU[K]||[]).filter(x=>!SEL.has(x.id));SEL.clear();sw(K);R()}
+const PCSS='.pgb{page-break-after:always;padding:6px 4px}.pgb:last-child{page-break-after:auto}.ph{display:flex;align-items:center;gap:12px;border-bottom:2px solid #333;padding-bottom:8px;margin-bottom:12px}.ph img{width:64px;height:64px;object-fit:contain}.pt{font-size:20px;font-weight:700}.ptb{width:100%;border-collapse:collapse;font-size:13px}.ptb th,.ptb td{border:1px solid #888;padding:6px;text-align:center}.ptb th{background:#eee}.ptb td{background:#fff}.ptb td.n{text-align:start;white-space:normal;overflow-wrap:anywhere;line-height:1.8;font-size:14px}.ptb tr.cl td{background:#e8e8e8;font-weight:700;text-align:start}.ptb tr{page-break-inside:avoid}.ptb tr.tot td{font-weight:700;background:#f3f3f3}.cbk{margin-bottom:14px;page-break-inside:avoid;break-inside:avoid}.ct{font-size:17px;font-weight:700;margin:0 0 6px}.sg{margin-top:28px;display:flex;justify-content:space-between;font-size:14px}';
+function nmLines(names,max,per){per=per||3;const L=[];let cur=[],len=0;names.forEach(n=>{const add=(cur.length?2:0)+n.length;if(cur.length&&(cur.length>=per||len+add>max)){L.push(cur);cur=[];len=0}cur.push(n);len+=(cur.length>1?2:0)+n.length});if(cur.length)L.push(cur);return L.map((a,i)=>a.join('، ')+(i<L.length-1?'،':''))}
+function subC(o,n){const r=o.rows.filter(x=>x.n==n);return{g:o.g,rows:r,gT:r.reduce((a,x)=>a+x.t,0),gA:r.reduce((a,x)=>a+x.a,0),gP:r.reduce((a,x)=>a+x.p,0)}}
+function gLbl(nm){nm=String(nm||'');return /^\s*الصف/.test(nm)?nm:'الصف '+nm}
+function prHTML(gid,n){const s=stats(),C=cfg(),TH='<tr><th style="width:13%">عدد الطلاب</th><th style="width:13%">الحضور</th><th style="width:13%">الغياب</th><th>أسماء الطلاب</th></tr>';return '<style>'+PCSS+'</style>'+s.out.filter(o=>!gid||o.g.id==gid).map(o=>n?subC(o,n):o).map(o=>`<section class="pgb"><div class="ph">${C.logo?`<img src="${C.logo}" alt="">`:''}<div><div class="pt">${esc(C.school||'كشف الغياب اليومي')}</div><div>كشف غياب ${esc(gLbl(o.g.name))}${n?' '+n:''} — ${dlabel()} — ${pn(VP())}</div></div></div>${o.rows.map(r=>`<div class="cbk"><div class="ct">${esc(gLbl(o.g.name))} ${r.n}</div><table class="ptb">${TH}<tr><td>${r.t}</td><td>${r.done?r.p:'—'}</td><td>${r.done?r.a:'—'}</td><td class="n">${r.names.length?r.names.map(x=>'<div>'+esc(SN(x))+'</div>').join(''):(!r.t?'—':r.done?'لا يوجد غياب':'لم يُرصد')}</td></tr></table></div>`).join('')}${n?'':`<div class="cbk"><div class="ct">مجموع ${esc(gLbl(o.g.name))}</div><table class="ptb"><tr><th style="width:13%">عدد الطلاب</th><th style="width:13%">الحضور</th><th style="width:13%">الغياب</th><th>نسبة الغياب</th></tr><tr class="tot"><td>${o.gT}</td><td>${o.gP}</td><td>${o.gA}</td><td>${pc(o.gA,o.gP+o.gA)}</td></tr></table></div>`}<div class="sg"><span>مدير المدرسة: ${esc(C.principal||'..............')}</span><span>التوقيع: ..............</span></div></section>`).join('')}
+function pr(gid,n){document.getElementById('pr').innerHTML=prHTML(gid,n);try{doPrint()}catch(e){msg='تعذرت الطباعة من هذه الصفحة، استخدم «حفظ ملف للطباعة»';R()}}
+async function sv(gid,n){const d={save:o=>saveFile(o.filename,o.data)};const doc='<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>كشف الغياب</title><style>body{font-family:Tahoma,Arial,sans-serif;margin:18px;color:#000}</style></head><body>'+prHTML(gid,n)+'</body></html>';try{await d.save({filename:'absence-'+D+'.html',data:doc});msg='تم حفظ الملف، افتحه ثم اطبعه'}catch(e){if(e.code!='declined')msg='تعذر الحفظ'}R()}
+function snm(n,used){let s=[...String(n)].filter(ch=>':*?[]/\\'.indexOf(ch)<0).join('').trim().slice(0,28)||'صف',b=s,i=2;while(used.has(s))s=b.slice(0,26)+' '+i++;used.add(s);return s}
+async function xl(gid,n){
+if(!window.ExcelJS){msg='تعذر تحميل مكتبة التصدير، تأكد من الاتصال بالإنترنت';R();return}
+const d={save:o=>saveFile(o.filename,o.data)};
+try{
+const s=stats(),C=cfg(),wb=new ExcelJS.Workbook(),used=new Set(),F='Tahoma',PR='FF5B4BDB',LT='FFEDE9FE',bd={style:'thin',color:{argb:'FF9CA3AF'}},B={top:bd,left:bd,bottom:bd,right:bd},gr=s.out.filter(o=>!gid||o.g.id==gid).map(o=>n?subC(o,n):o);
+let img=null;if(C.logo){try{img=wb.addImage({base64:C.logo,extension:C.logo.indexOf('image/png')>0?'png':'jpeg'})}catch(e){}}
+const fl=a=>({type:'pattern',pattern:'solid',fgColor:{argb:a}});
+const mk=(nm,w,sub)=>{const ws=wb.addWorksheet(snm(nm,used),{views:[{rightToLeft:true,state:'frozen',ySplit:5}],pageSetup:{paperSize:9,orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0,horizontalCentered:true}}),n=w.length,st=img?2:1;w.forEach((x,i)=>{ws.getColumn(i+1).width=x});
+[[C.school||'كشف الغياب اليومي',28,{bold:true,size:18,color:{argb:'FF1F2D5A'}}],[sub,22,{bold:true,size:13,color:{argb:PR}}],['التاريخ: '+dlabel()+' — '+pn(VP()),20,{size:11,color:{argb:'FF6B7280'}}]].forEach((a,i)=>{ws.mergeCells(i+1,st,i+1,n);const c=ws.getCell(i+1,st);c.value=a[0];c.font=Object.assign({name:F},a[2]);c.alignment={horizontal:'center',vertical:'middle'};ws.getRow(i+1).height=a[1]});
+if(img)ws.addImage(img,{tl:{col:.15,row:.15},ext:{width:64,height:64}});return ws};
+const hdr=(ws,L)=>{const r=ws.getRow(5);r.height=28;L.forEach((l,i)=>{const c=r.getCell(i+1);c.value=l;c.font={name:F,bold:true,size:12,color:{argb:'FFFFFFFF'}};c.fill=fl(PR);c.alignment={horizontal:'center',vertical:'middle',wrapText:true};c.border=B})};
+const cl2=(c,v,o)=>{o=o||{};c.value=v;c.font={name:F,size:11,bold:!!o.b,color:{argb:o.col||'FF111827'}};c.alignment={horizontal:o.l?'right':'center',vertical:'middle',wrapText:true};c.border=B;if(o.f)c.fill=fl(o.f);if(o.p)c.numFmt='0.0%'};
+if(!gid){const ws=mk('ملخص المدرسة',[26,12,12,12,15],'ملخص الغياب لكل الصفوف');hdr(ws,['الصف','الإجمالي','الحضور','الغياب','نسبة الغياب']);let r=6;
+s.out.forEach((o,i)=>{const f=i%2?'FFF8F7FF':'FFFFFFFF',ra=o.gP+o.gA?o.gA/(o.gP+o.gA):'—';[[o.g.name,{b:1,f}],[o.gT,{f}],[o.gP,{f}],[o.gA,{f,b:!!o.gA,col:o.gA?'FFB91C1C':null}],[ra,{f,p:typeof ra=='number'}]].forEach((a,j)=>cl2(ws.getCell(r,j+1),a[0],a[1]));r++});
+const ra=s.tP+s.tA?s.tA/(s.tP+s.tA):'—';[['المجموع',{b:1,f:LT}],[s.tT,{b:1,f:LT}],[s.tP,{b:1,f:LT}],[s.tA,{b:1,f:LT}],[ra,{b:1,f:LT,p:typeof ra=='number'}]].forEach((a,j)=>cl2(ws.getCell(r,j+1),a[0],a[1]))}
+gr.forEach(o=>{const ws=mk(o.g.name+(n?' ف'+n:''),[10,11,11,11,14,13,62],'كشف غياب '+o.g.name+(n?' — فصل '+n:''));hdr(ws,['الفصل','الإجمالي','الحضور','الغياب','نسبة الغياب','الحالة','أسماء الغائبين']);let r=6;
+o.rows.forEach((x,i)=>{const f=x.a?'FFFEE2E2':(i%2?'FFF8F7FF':'FFFFFFFF'),nm=nmLines(x.names.map(SN),56).join('\n'),ra=x.done&&x.t?x.a/x.t:'—';
+[[x.n,{b:1,f}],[x.t,{f}],[x.done?x.p:'—',{f}],[x.done?x.a:'—',{f,b:!!x.a,col:x.a?'FFB91C1C':null}],[ra,{f,p:typeof ra=='number'}],[!x.t?'بلا طلاب':x.done?'تم الرصد':'لم يُرصد',{f}],[nm,{f,l:1}]].forEach((a,j)=>cl2(ws.getCell(r,j+1),a[0],a[1]));ws.getRow(r).height=Math.max(22,nm.split('\n').length*18+4);r++});
+const ra=o.gP+o.gA?o.gA/(o.gP+o.gA):'—';[['المجموع',{b:1,f:LT}],[o.gT,{b:1,f:LT}],[o.gP,{b:1,f:LT}],[o.gA,{b:1,f:LT}],[ra,{b:1,f:LT,p:typeof ra=='number'}],['',{f:LT}],['',{f:LT}]].forEach((a,j)=>cl2(ws.getCell(r,j+1),a[0],a[1]));
+r+=2;ws.mergeCells(r,1,r,4);ws.mergeCells(r,5,r,7);const a1=ws.getCell(r,1),a2=ws.getCell(r,5);a1.value='مدير المدرسة: '+(C.principal||'..............');a2.value='التوقيع: ..............';[a1,a2].forEach(c=>{c.font={name:F,size:12,bold:true};c.alignment={horizontal:'right'}})});
+const buf=await wb.xlsx.writeBuffer();await d.save({filename:'absence-'+D+(gid?'-'+gid:'')+(n?'-'+n:'')+'.xlsx',data:buf});msg='تم تصدير ملف Excel'}catch(e){msg=e&&e.code=='declined'?'':'تعذر التصدير'}R()}
+function burst(x,y,cs,n,sp){if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;for(let i=0;i<n;i++){const s=document.createElement('span');s.className='sp';s.textContent=cs[i%cs.length];const a=Math.random()*6.28,d=sp*(.4+Math.random()*.6);s.style.cssText+=`left:${x}px;top:${y}px;--dx:${Math.cos(a)*d}px;--dy:${Math.sin(a)*d}px`;document.body.appendChild(s);setTimeout(()=>s.remove(),900)}}
+document.addEventListener('click',e=>{if(e.target.closest('button'))burst(e.clientX,e.clientY,['✨','⭐','✦','💫'],6,60)});
+function R(){const a=document.getElementById('app');
+if(!ready){return}
+const tb=document.querySelector('.tabs');if(!URL_){tb.style.display='none';a.innerHTML=(msg?`<div class="msg">${msg}</div>`:'')+vConn()+instCard();msg='';return}if(GATE){tb.style.display='none';a.innerHTML=(msg?`<div class="msg">${msg}</div>`:'')+vGate()+instCard();msg='';return}tb.style.display='';
+if(K!==LK){SEL.clear();SM=0;LK=K}
+if(T=='man'&&!isAdmin)T='entry';if(T=='rep'&&!canStat())T='entry';if(T=='conn'&&!isAdmin)T='entry';
+const C0=cfg(),lgo=document.getElementById('lg');document.getElementById('ttl').textContent=C0.school||'📋 إحصائية الغياب اليومي';document.getElementById('sub').textContent=C0.school?'إحصائية الغياب اليومي'+(C0.principal?' — مدير المدرسة: '+C0.principal:''):'';if(C0.logo){lgo.src=C0.logo;lgo.hidden=false}else lgo.hidden=true;
+const body=T=='entry'?vEntry():T=='rep'?vRep():T=='conn'?vConn():vMan();
+a.innerHTML=(msg?`<div class="msg">${msg}</div>`:'')+body;msg='';
+['entry','rep','man','conn'].forEach(x=>{const b=document.getElementById('t-'+x);b.className=x==T?'on':'';b.style.display=(x=='man'||x=='conn')?(isAdmin?'':'none'):(x=='rep'?(canStat()?'':'none'):'')});
+if(T=='rep'){const s=stats();if(s.cc>0&&s.rc==s.cc&&!conf[D]){conf[D]=1;burst(innerWidth/2,innerHeight/3,['🎉','✨','🎊','⭐','💜'],26,170)}}}
+init();
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!isNative()){const had=!!navigator.serviceWorker.controller;addEventListener('load',()=>{navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});let rl=0;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!rl){rl=1;location.reload()}})})}
+</script></body></html>
