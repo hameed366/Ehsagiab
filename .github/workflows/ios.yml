@@ -1,0 +1,34 @@
+name: Build iOS
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+jobs:
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+      - run: npx cap add ios
+      - name: Generate icons
+        continue-on-error: true
+        run: npx @capacitor/assets generate --ios
+      - run: npx cap sync ios
+      - name: Build (unsigned)
+        run: |
+          xcodebuild -workspace ios/App/App.xcworkspace -scheme App \
+            -configuration Release -sdk iphoneos \
+            -archivePath build/App.xcarchive archive \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
+      - name: Package unsigned IPA
+        run: |
+          mkdir -p Payload
+          cp -R build/App.xcarchive/Products/Applications/App.app Payload/
+          zip -qr absence-unsigned.ipa Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: absence-ios-unsigned-ipa
+          path: absence-unsigned.ipa
